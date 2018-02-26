@@ -1,6 +1,5 @@
 const {carReducer} = require('./carReducer')
 const {store} = require('../redux/index')
-const {compose} = require('../redux/compose')
 
 
 
