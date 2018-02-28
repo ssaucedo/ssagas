@@ -1,34 +1,41 @@
 const {asyncCodeExecutor} = require('../generators/index')
-
+const {handleAction} = require('./internals')
 
 const EFFECT_TYPES = {
   CALL: 'CALL',
   TAKE: 'TAKE',
+  TAKE_ALL: 'TAKE_ALL',
+  TAKE_ONE: 'TAKE_ONE',
+  TAKE_LATEST: 'TAKE_LATEST',
+  TAKE_AND_DELAY: 'TAKE_AND_DELAY',
+}
+
+function or(value) {
+  return value !== undefined ? value : []
 }
 
 const sagasExecutor = (config) => {
   const sagas = {
-    effects: config.reduce((res, eff) => {
-      res[eff.action] = [...(res[eff.action] || []), eff]
-      return res
-    }, {})
+    register: config.reduce((red, ef) => {
+      red[ef.type] = (red[ef.type] || {})
+      red[ef.type][ef.action] = (red[ef.type][ef.action] || [])
+      red[ef.type][ef.action] = [...red[ef.type][ef.action], {
+        type: ef.type, action: ef.action, gen: ef.gen,
+      }]
+      return red
+    }, {}),
+    state: {
+      inProgress: {},
+      taking: {}
+    },
+    history: {}
   }
+
   return sagasMiddleware(sagas)
 }
 
 const sagasMiddleware = sagas => store => next => action => {
-  console.log('SAGAS: ',action)
-  const actionEffects = sagas.effects[action.type]
-  if (actionEffects && actionEffects.length !== 0) {
-    for (eff of actionEffects) {
-      try {
-        asyncCodeExecutor(eff.gen())
-      } catch (e) {
-        console.log('ERROR WHILE EXECUTING TASK')
-      }
-
-    }
-  }
+  handleAction(action, sagas)
 }
 
 exports.sagasMiddleware = {
