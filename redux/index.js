@@ -23,11 +23,13 @@ const store = function (defaultState, reducers, middlewares) {
 
   _reduxDispatch = _reduxDispatch.bind(this)
 
+  _applyMiddlewares = _applyMiddlewares.bind(this)
+
+  this.dispatch = dispatch.bind(this)
+
   this.state = defaultState
 
   this.reducers = reducers
-
-  this.middlewares = _applyMiddlewares(middlewares || [])
 
   this.listeners = []
 
@@ -37,10 +39,6 @@ const store = function (defaultState, reducers, middlewares) {
 
   this.subscribe = function (listener) {
     this.listeners = [...this.listeners, listener]
-  }
-
-  this.dispatch = function (action) {
-    this.middlewares(action)
   }
 
   function _reduxDispatch (action) {
@@ -56,6 +54,10 @@ const store = function (defaultState, reducers, middlewares) {
     })
   }
 
+  function dispatch(action) {
+    this.middlewares(action)
+  }
+
   function _applyMiddlewares (middlewares) {
     const chain = middlewares.map(m => m({
       dispatch: this.dispatch,
@@ -64,6 +66,9 @@ const store = function (defaultState, reducers, middlewares) {
 
     return compose(...chain)(_reduxDispatch)
   }
+
+  this.middlewares = _applyMiddlewares(middlewares || [])
+
 
 }
 

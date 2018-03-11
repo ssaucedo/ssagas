@@ -1,14 +1,6 @@
 const {asyncCodeExecutor} = require('../generators/index')
 const {handleAction} = require('./internals')
-
-const EFFECT_TYPES = {
-  CALL: 'CALL',
-  TAKE: 'TAKE',
-  TAKE_ALL: 'TAKE_ALL',
-  TAKE_ONE: 'TAKE_ONE',
-  TAKE_LATEST: 'TAKE_LATEST',
-  TAKE_AND_DELAY: 'TAKE_AND_DELAY',
-}
+const {EFFECT_TYPES} = require('./effects')
 
 function or(value) {
   return value !== undefined ? value : []
@@ -35,7 +27,7 @@ const sagasExecutor = (config) => {
 }
 
 const sagasMiddleware = sagas => store => next => action => {
-  handleAction(action, sagas)
+  handleAction(action, sagas, store)
 }
 
 exports.sagasMiddleware = {

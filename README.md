@@ -12,10 +12,10 @@ Custom implementation of redux-saga. The idea is implement the most important re
 
 2) Implement take effect:
         Be able to yield a take effect from the generator and wait until the associated action.
-         
-###  NEXT STEPS:         
 
 3) Be able to dispatch actions from a generator.
+
+###  NEXT STEPS:         
 
 4) Tests.
 
